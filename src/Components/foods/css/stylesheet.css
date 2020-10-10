@@ -1,0 +1,12 @@
+.smallBox{
+    /*float: right;*/
+    margin: 0 100px 20px 20px;
+    padding: 10px;
+    border-radius: 10px;
+    width: 80%;
+    background-color: #f7f7fb;
+}
+td {
+    border: 1px solid #ddd;
+    padding: 3px;
+}

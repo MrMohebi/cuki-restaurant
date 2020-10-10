@@ -1,0 +1,13 @@
+.shMainContainer{
+    position: absolute;
+    text-align: center;
+    width: 225px;
+    height: 225px;
+    background-color: #ffffff;
+    border-radius: 20px;
+}
+
+.shRow{
+    padding: 5px;
+    display: inline-block;
+}
