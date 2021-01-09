@@ -6,7 +6,7 @@
 >
 > #### Required fields:
 >   - **username**
->   - **password** (restaurant english name)
+>   - **password**
 >   
 >   #### Return Values ``JSON``:
 >   ```json
