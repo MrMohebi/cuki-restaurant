@@ -18,3 +18,12 @@ td {
     .in-queue {border-left: 3px solid #27a844}
     .mobile-radius {border-top-left-radius: 15px}
 }
+.ltr{
+    direction: ltr;
+}
+.dropdown-toggle::after{
+right: 5px;
+}
+.IranSansMedium{
+    font-family:IRANSans;
+}

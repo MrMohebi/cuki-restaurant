@@ -2,6 +2,10 @@
   font-family: 'IRANSansMobile_Light';
   src: local('IRANSansMobile_Light'), url(/fonts/MobileFonts/IRANSansMobile_Light.ttf) format('truetype');
 }
+@font-face {
+  font-family: 'IRANSansMobile_Med';
+  src: local('IRANSansMobile_Medium'), url(/fonts/MobileFonts/IRANSansMobile_Medium.ttf) format('truetype');
+}
 
 body {
   margin: 0;

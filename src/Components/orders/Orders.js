@@ -180,7 +180,7 @@ class Orders extends React.Component {
                     TransitionComponent={(props)=>{return <Slide {...props} direction="up"/>}}
                 />
 
-                <div className='justForGap'></div>
+                <div className='justForGap'/>
                 <div className="smallBox">
                     {this.state.datePikerDate.from && true ? (
                         <DatePicker value={this.state.datePikerDate} onChange={this.onChangeCalender} locale='fa' shouldHighlightWeekends/>
@@ -232,7 +232,8 @@ class Orders extends React.Component {
                             orderStatusButton =  <button title="تغییر وضعیت به در صف" onClick={()=>{this.handelChangeOrderStatus(eachOrder.tracking_id, eachOrder.order_status)}} style={{width: "100px"}} className="btn btn-sm btn-success">انجام شده</button>
                             break;
                     }
-
+                    let orderStatus = eachOrder.order_status
+                    // console.log(orderStatus)
                     return(
                         [
                             <tr className="bg-white" id={"orderRowID_"+eachOrder.orders_id}  key={"orderRowID_" + eachOrder.orders_id}>
@@ -250,8 +251,20 @@ class Orders extends React.Component {
                                 </td>
                                 <td className="d-none d-sm-table-cell">{func.days_passed(eachOrder.ordered_date).split("\n").map(eachPart=>{return <p>{eachPart}</p>})}</td>
                                 <td className="d-none d-sm-table-cell">{sum} <br/><span style={{color:"#0dec1a"}}>{ payStatus }</span></td>
-                                <td className="d-none d-sm-table-cell">
-                                    {orderStatusButton}
+                                <td className="d-none d-sm-table-cell ltr IranSansMedium">
+                                    <div className="btn-group">
+                                        <button type="button" className={'btn' + ''}>{this.state.orderStatusPersian[orderStatus.toString()]}</button>
+                                        <button type="button"
+                                                className="btn btn-danger dropdown-toggle dropdown-toggle-split "
+                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <span className="sr-only">Toggle Dropdown</span>
+                                        </button>
+                                        <div className="dropdown-menu">
+                                            <a className="dropdown-item IranSansMedium" href="#">انجام شده</a>
+                                            <div className="dropdown-divider"/>
+                                            <a className="dropdown-item IranSansMedium" href="#">تحویل شده</a>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
 
@@ -446,6 +459,13 @@ class Orders extends React.Component {
         lastNumberOfOrders:0,
         useSnackbar: true,
         snackbarOpen:false,
+        orderStatusPersian:{
+            inLine:'در صف',
+            done:'انجام شده',
+            delivered:'تحویل شده',
+            deleted:'حذف شده'
+
+        }
     }
 }
 
