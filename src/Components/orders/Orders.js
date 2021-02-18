@@ -104,6 +104,7 @@ class Orders extends React.Component {
     }
 
     callBackChangeOrderStatus = (res) =>{
+        console.log(res)
         if((res.statusCode === 200) || (res.statusCode === 400 && res.info !== undefined)){
             this.onChangeCalender(this.state.datePikerDate);
             ReactSwal.fire({
@@ -117,54 +118,9 @@ class Orders extends React.Component {
         }
     }
 
-    handelChangeOrderStatus = (trakingId, currentStatus, newStatus = null) =>{
-        if(newStatus === "deleted"){
-            ReactSwal.fire({
-                title: <h1>حذف سفارش</h1>,
-                text: "؟آیا از حذف سفارش اطمینان دارید",
-                icon: "warning",
-                showConfirmButton: true,
-                confirmButtonText: "!آره حذفش کن",
-                showCancelButton: true,
-                cancelButtonText: "نه دستم خورد",
-            }).then((result)=>{
-                if(result.isConfirmed){
-                    ReactSwal.fire({
-                        title: <h2>علت حذف سفارش</h2>,
-                        icon: "question",
-                        input: 'text',
-                        showConfirmButton: true,
-                        confirmButtonText: "حذف سفارش با علت بالا",
-                        showCancelButton: true,
-                        cancelButtonText: "!وایسا حذفش نکن",
-                    }).then((result)=>{
-                        if(result.isConfirmed){
-                            requests.changeOrderStatus(trakingId, "deleted", result.value, this.callBackChangeOrderStatus)
-                        }
-                    })
-                }
-            })
-        }else {
-            if(currentStatus === "inLine"){
-                newStatus = "done";
-                requests.changeOrderStatus(trakingId, newStatus, "",this.callBackChangeOrderStatus)
-            }else if(currentStatus === "done"){
-                newStatus = "inLine";
-                ReactSwal.fire({
-                    title: <h1>تغییر وضعیت</h1>,
-                    text: "؟!آیا از تغییر وضعیت سفارش به انجام نشده اطمینان دارید",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    confirmButtonText: "!آره درصفش کن",
-                    showCancelButton: true,
-                    cancelButtonText: "نه دستم خورد",
-                }).then((result)=>{
-                    if(result.isConfirmed){
-                        requests.changeOrderStatus(trakingId, newStatus, "",this.callBackChangeOrderStatus)
-                    }
-                })
-            }
-        }
+    handelChangeOrderStatus = (trakingId,newStatus,deleteReason) =>{
+        console.log(trakingId)
+        requests.changeOrderStatus(trakingId,newStatus,deleteReason,this.callBackChangeOrderStatus)
     }
 
     render() {
@@ -221,19 +177,29 @@ class Orders extends React.Component {
                     sum = func.numberWithCommas(sum);
 
                     let orderStatusButton = <button>not define</button>
-                    switch (eachOrder.order_status) {
-                        case "inLine" :
-                            orderStatusButton =  <button title="تغییر وضعیت به انجام شده" onClick={()=>{this.handelChangeOrderStatus(eachOrder.tracking_id, eachOrder.order_status)}} style={{width: "100px"}} className="btn btn-sm btn-outline-success">در صف</button>
-                            break;
-                        case "deleted" :
-                            orderStatusButton =  <button title={eachOrder.delete_reason} onClick={()=>{ReactSwal.fire({title: <h2>{eachOrder.delete_reason}</h2>, icon: "info", timer: 4000, timerProgressBar: true})}} style={{width: "100px"}} className="btn btn-sm btn-outline-danger">حذف شده</button>
-                            break;
-                        case "done" :
-                            orderStatusButton =  <button title="تغییر وضعیت به در صف" onClick={()=>{this.handelChangeOrderStatus(eachOrder.tracking_id, eachOrder.order_status)}} style={{width: "100px"}} className="btn btn-sm btn-success">انجام شده</button>
-                            break;
-                    }
+                    // switch (eachOrder.order_status) {
+                    //     case "inLine" :
+                    //         orderStatusButton =  <button title="تغییر وضعیت به انجام شده" onClick={()=>{this.handelChangeOrderStatus(eachOrder.tracking_id, eachOrder.order_status)}} style={{width: "100px"}} className="btn btn-sm btn-outline-success">در صف</button>
+                    //         break;
+                    //     case "deleted" :
+                    //         orderStatusButton =  <button title={eachOrder.delete_reason} onClick={()=>{ReactSwal.fire({title: <h2>{eachOrder.delete_reason}</h2>, icon: "info", timer: 4000, timerProgressBar: true})}} style={{width: "100px"}} className="btn btn-sm btn-outline-danger">حذف شده</button>
+                    //         break;
+                    //     case "done" :
+                    //         orderStatusButton =  <button title="تغییر وضعیت به در صف" onClick={()=>{this.handelChangeOrderStatus(eachOrder.tracking_id, eachOrder.order_status)}} style={{width: "100px"}} className="btn btn-sm btn-success">انجام شده</button>
+                    //         break;
+                    // }
                     let orderStatus = eachOrder.order_status
-                    // console.log(orderStatus)
+                    let twoOtherOption = orderStatus === 'inLine' ?[
+                        'انجام شده','تحویل شده'
+                        ]
+
+                    :orderStatus === 'done'?[
+                                'در صف','تحویل شده'
+                            ]
+                            :[
+                            'در صف','انجام شده'
+                ]
+                    let btnClasses = (eachOrder.order_status === 'done'?'btn-success':(eachOrder.order_status === 'inLine'?'btn-outline-primary':'btn-danger'))
                     return(
                         [
                             <tr className="bg-white" id={"orderRowID_"+eachOrder.orders_id}  key={"orderRowID_" + eachOrder.orders_id}>
@@ -253,16 +219,16 @@ class Orders extends React.Component {
                                 <td className="d-none d-sm-table-cell">{sum} <br/><span style={{color:"#0dec1a"}}>{ payStatus }</span></td>
                                 <td className="d-none d-sm-table-cell ltr IranSansMedium">
                                     <div className="btn-group">
-                                        <button type="button" className={'btn' + ''}>{this.state.orderStatusPersian[orderStatus.toString()]}</button>
+                                        <button type="button" className={'btn ' + btnClasses}>{this.state.orderStatusPersian[orderStatus.toString()]}</button>
                                         <button type="button"
-                                                className="btn btn-danger dropdown-toggle dropdown-toggle-split "
+                                                className={"btn dropdown-toggle dropdown-toggle-split "+ btnClasses}
                                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             <span className="sr-only">Toggle Dropdown</span>
                                         </button>
                                         <div className="dropdown-menu">
-                                            <a className="dropdown-item IranSansMedium" href="#">انجام شده</a>
+                                            <a className="dropdown-item IranSansMedium" onClick={()=>{this.handelChangeOrderStatus(eachOrder.tracking_id,'inLine')}} href="#">{twoOtherOption[0]}</a>
                                             <div className="dropdown-divider"/>
-                                            <a className="dropdown-item IranSansMedium" href="#">تحویل شده</a>
+                                            <a className="dropdown-item IranSansMedium" href="#">{twoOtherOption[1]}</a>
                                         </div>
                                     </div>
                                 </td>
@@ -276,14 +242,21 @@ class Orders extends React.Component {
                                 <td className="d-none d-sm-table-cell text-right pr-2 pl-2">
                                     <a className="float-right text-primary"><FontAwesomeIcon icon={faUser}/> {eachOrder.customer_name} </a>
                                     <br/>
-                                    <a  title="میز"><img style={{width: "25px"}} src="https://img.icons8.com/material/50/000000/table.png"/> {eachOrder.order_table?eachOrder.order_table:0} </a>
                                 </td>
 
-                                <td className="d-none d-sm-table-cell text-right pr-2" colSpan="2"><FontAwesomeIcon icon={faMapMarkerAlt} />  {eachOrder.address?eachOrder.address:'حضوری'}   </td>
+                                <td className="d-none d-sm-table-cell text-right pr-2" colSpan="2">
+                                    <a  title="میز"><img style={{width: "25px"}} src="https://img.icons8.com/material/50/000000/table.png"/> {eachOrder.order_table?eachOrder.order_table:0} </a>
+
+                                    <FontAwesomeIcon style={{marginRight:'20px'}} icon={faMapMarkerAlt} />  {eachOrder.address?eachOrder.address:'حضوری'}   </td>
 
                                 <td className="d-none d-sm-table-cell">
                                     {/*<button className="btn-sm btn-dark ml-3"><FontAwesomeIcon icon={faHistory}/>درحال اپدیت</button>*/}
-                                    <button className="btn-sm btn-danger" onClick={()=>{this.handelChangeOrderStatus(eachOrder.tracking_id, eachOrder.order_status, (eachOrder.order_status==="deleted")? "inLine" : "deleted")}}  title="حذف" style={{cursor: "pointer"}} type="button"><FontAwesomeIcon icon={faTrash} aria-hidden="true"/>{eachOrder.order_status==="deleted"? "لغو حذف" : "حدف"}</button>
+                                    {eachOrder.order_status === 'deleted'?
+                                        <span className='IranSansMedium orderDeleteReason'>{eachOrder.delete_reason}</span>
+                                    :
+                                        <button className="IranSansMedium btn-sm btn-danger" onClick={()=>{this.handelChangeOrderStatus(eachOrder.tracking_id, 'deleted')}}  title="حذف" style={{cursor: "pointer"}} type="button"><FontAwesomeIcon style={{marginLeft:'10px'}} icon={faTrash} aria-hidden="true"/>{eachOrder.order_status==="deleted"? "لغو حذف" : "حذف"}</button>
+                                    }
+                                    {/*<button className="btn-sm btn-danger" onClick={()=>{this.handelChangeOrderStatus(eachOrder.tracking_id, eachOrder.order_status, (eachOrder.order_status==="deleted")? "inLine" : "deleted")}}  title="حذف" style={{cursor: "pointer"}} type="button"><FontAwesomeIcon icon={faTrash} aria-hidden="true"/>{eachOrder.order_status==="deleted"? "لغو حذف" : "حدف"}</button>*/}
                                 </td>
                             </tr>
 
@@ -328,17 +301,17 @@ class Orders extends React.Component {
                     }
 
                     let orderStatusButton = <button>not define</button>
-                    switch (eachOrder.order_status) {
-                        case "inLine" :
-                            orderStatusButton =  <button title="تغییر وضعیت به انجام شده" onClick={()=>{this.handelChangeOrderStatus(eachOrder.tracking_id, eachOrder.order_status)}} style={{width: "100px"}} className="btn btn-sm btn-outline-success">در صف</button>
-                            break;
-                        case "deleted" :
-                            orderStatusButton =  <button title={eachOrder.delete_reason} onClick={()=>{ReactSwal.fire({title: <h2>{eachOrder.delete_reason}</h2>, icon: "info", timer: 4000, timerProgressBar: true})}} style={{width: "100px"}} className="btn btn-sm btn-outline-danger">حذف شده</button>
-                            break;
-                        case "done" :
-                            orderStatusButton =  <button title="تغییر وضعیت به در صف" onClick={()=>{this.handelChangeOrderStatus(eachOrder.tracking_id, eachOrder.order_status)}} style={{width: "100px"}} className="btn btn-sm btn-success">انجام شده</button>
-                            break;
-                    }
+                    // switch (eachOrder.order_status) {
+                    //     case "inLine" :
+                    //         orderStatusButton =  <button title="تغییر وضعیت به انجام شده" onClick={()=>{this.handelChangeOrderStatus(eachOrder.tracking_id, eachOrder.order_status)}} style={{width: "100px"}} className="btn btn-sm btn-outline-success">در صف</button>
+                    //         break;
+                    //     case "deleted" :
+                    //         orderStatusButton =  <button title={eachOrder.delete_reason} onClick={()=>{ReactSwal.fire({title: <h2>{eachOrder.delete_reason}</h2>, icon: "info", timer: 4000, timerProgressBar: true})}} style={{width: "100px"}} className="btn btn-sm btn-outline-danger">حذف شده</button>
+                    //         break;
+                    //     case "done" :
+                    //         orderStatusButton =  <button title="تغییر وضعیت به در صف" onClick={()=>{this.handelChangeOrderStatus(eachOrder.tracking_id, eachOrder.order_status)}} style={{width: "100px"}} className="btn btn-sm btn-success">انجام شده</button>
+                    //         break;
+                    // }
 
                     return(
                         [
@@ -377,7 +350,7 @@ class Orders extends React.Component {
 
                                 <td className="d-none d-sm-table-cell">
                                     {/*<button className="btn-sm btn-dark ml-3"><FontAwesomeIcon icon={faHistory}/>درحال اپدیت</button>*/}
-                                    <button className="btn-sm btn-danger" onClick={()=>{this.handelChangeOrderStatus(eachOrder.tracking_id, eachOrder.order_status, (eachOrder.order_status==="deleted")? "inLine" : "deleted")}}  title="حذف" style={{cursor: "pointer"}} type="button"><FontAwesomeIcon icon={faTrash} aria-hidden="true"/>{eachOrder.order_status==="deleted"? "لغو حذف" : "حدف"}</button>
+                                    {/*<button className="btn-sm btn-danger" onClick={()=>{this.handelChangeOrderStatus(eachOrder.tracking_id, eachOrder.order_status, (eachOrder.order_status==="deleted")? "inLine" : "deleted")}}  title="حذف" style={{cursor: "pointer"}} type="button"><FontAwesomeIcon icon={faTrash} aria-hidden="true"/>{eachOrder.order_status==="deleted"? "لغو حذف" : "حدف"}</button>*/}
                                 </td>
                             </tr>
 

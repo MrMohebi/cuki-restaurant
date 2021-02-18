@@ -122,10 +122,14 @@ export const changeFoodGroup = (foodId, newGroup, callbackFunction)=>{
 
 
 export const changeOrderStatus = (trackingId, orderStatus, deleteReason, callbackFunction)=>{
+    console.log('request created')
     let token = store.getState().reducerRestaurantUser.token;
     let englishName = store.getState().reducerRestaurantUser.englishName;
-    $.post(BASE_URL+'changeOrderStatus.modify.php',{token, englishName,trackingId, orderStatus, deleteReason: deleteReason}).then(res =>{
+    $.post(BASE_URL+'changeOrderStatus.modify.php',{token,trackingId, orderStatus, deleteReason: deleteReason}).then(res =>{
+        console.log('sent')
         callbackFunction(res)
+    }, (e)=>{
+        console.log(e)
     })
 }
 

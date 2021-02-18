@@ -27,3 +27,12 @@ right: 5px;
 .IranSansMedium{
     font-family:IRANSans;
 }
+.orderDeleteReason {
+    max-width: 100px;
+    max-height: 60px;
+    font-size: 0.7rem;
+    line-height: 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
